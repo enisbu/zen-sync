@@ -69,7 +69,7 @@ zen_close_remote() {
     proc=$(zen_proc_name "$ros")
     if ssh "$remote" "pgrep -x $proc >/dev/null 2>&1"; then
         step "  ◼" "Closing Zen on remote..."
-        ssh -o ConnectTimeout=5 "$remote" "kill -SIGTERM \$(pgrep -x $proc | head -1) 2>/dev/null; exit 0" || true
+        ssh -o ConnectTimeout=5 "$remote" "pkill -o -x $proc" || true
         sleep 5
     fi
 }
@@ -82,7 +82,8 @@ zen_open_remote() {
     if [[ "$ros" == "Darwin" ]]; then
         ssh "$remote" 'open -a Zen; exit 0' || true
     else
-        ssh "$remote" 'WAYLAND_DISPLAY=wayland-1 DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) nohup zen-browser >/dev/null 2>&1 </dev/null &; exit 0' || true
+        # sh -s, since the remote login shell may not be POSIX (e.g. fish)
+        ssh "$remote" sh -s <<<'WAYLAND_DISPLAY=wayland-1 DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) nohup zen-browser >/dev/null 2>&1 </dev/null &' || true
     fi
 }
 
@@ -268,7 +269,13 @@ init_ssh() {
 
     step "  ⟳" "Finding remote profile..."
     local remote_profile
-    remote_profile=$(ssh "$user@$host" 'for d in "$HOME/Library/Application Support/zen/Profiles" ~/.config/zen ~/.zen; do [[ -d "$d" ]] && { find "$d" -maxdepth 1 -type d -name "*.Default (release)" 2>/dev/null | head -1; break; }; done')
+    # sh -s, since the remote login shell may not be POSIX (e.g. fish)
+    remote_profile=$(ssh "$user@$host" sh -s <<'EOF'
+for d in "$HOME/Library/Application Support/zen/Profiles" "$HOME/.config/zen" "$HOME/.zen"; do
+    if [ -d "$d" ]; then find "$d" -maxdepth 1 -type d -name "*.Default (release)" 2>/dev/null | head -1; break; fi
+done
+EOF
+)
     [[ -n "$remote_profile" ]] || die "no Zen profile found on remote"
     ok "Remote: $(basename "$remote_profile")"
 
