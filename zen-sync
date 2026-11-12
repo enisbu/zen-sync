@@ -269,14 +269,20 @@ init_ssh() {
 
     step "  ⟳" "Finding remote profile..."
     local remote_profile
-    # sh -s, since the remote login shell may not be POSIX (e.g. fish)
+    # The profile Zen launches, per profiles.ini: the [Install...] Default=,
+    # else the [Profile...] marked Default=1 (e.g. home-manager). sh -s, since
+    # the remote login shell may not be POSIX (e.g. fish).
     remote_profile=$(ssh "$user@$host" sh -s <<'EOF'
-for d in "$HOME/Library/Application Support/zen/Profiles" "$HOME/.config/zen" "$HOME/.zen"; do
-    if [ -d "$d" ]; then find "$d" -maxdepth 1 -type d -name "*.Default (release)" 2>/dev/null | head -1; break; fi
+for root in "$HOME/Library/Application Support/zen" "$HOME/.config/zen" "$HOME/.zen"; do
+    [ -f "$root/profiles.ini" ] || continue
+    p=$(awk -F= '/^\[/ { s = $0 } s ~ /Install/ && $1 == "Default" { i = $2 } $1 == "Path" { path[s] = $2 } $0 == "Default=1" { d = s } END { print i ? i : path[d] }' "$root/profiles.ini")
+    [ -n "$p" ] || continue
+    case "$p" in /*) echo "$p" ;; *) echo "$root/$p" ;; esac
+    exit
 done
 EOF
 )
-    [[ -n "$remote_profile" ]] || die "no Zen profile found on remote"
+    [[ -n "$remote_profile" ]] || die "no default profile in profiles.ini on remote (looked in ~/Library/Application Support/zen, ~/.config/zen, ~/.zen)"
     ok "Remote: $(basename "$remote_profile")"
 
     cat > "$CONFIG_FILE" <<CONF
