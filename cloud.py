@@ -243,6 +243,7 @@ def main():
         "sessionstore-backups/previous.jsonlz4",
         "prefs.js",
         "containers.json",
+        "customKeys.json",
     ]
 
     if cmd == "test":

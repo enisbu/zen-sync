@@ -398,6 +398,7 @@ SYNC_FILES=(
     "sessionstore-backups/previous.jsonlz4"
     "prefs.js"
     "containers.json"
+    "customKeys.json"
 )
 
 # ─── Push ─────────────────────────────────────────────────────────────

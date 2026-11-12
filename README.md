@@ -128,6 +128,7 @@ Push/pull copies only the essential session files (~10 seconds over LAN, ~15 sec
 - `sessionstore-backups/recovery.jsonlz4` — active session with all open tabs
 - `prefs.js` — active workspace & preferences
 - `containers.json` — container tab config
+- `customKeys.json` — custom keyboard shortcuts
 
 In R2 mode, files are packed into a tar.gz archive, encrypted with age, and uploaded to your R2 bucket.
 
@@ -143,6 +144,7 @@ Merge reads both `zen-sessions.jsonlz4` files, combines missing spaces and tabs,
 | Active workspace       | Extensions & their data       |
 | Container tabs         | Cookies & site storage        |
 | Tab folders            | Cached data                   |
+| Keyboard shortcuts     |                               |
 
 ## Limitations
 
