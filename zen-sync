@@ -482,7 +482,7 @@ pull_ssh() {
     local remote="$REMOTE_USER@$REMOTE_HOST"
 
     header "pull"
-    printf "  ${WHITE}${B}%s${R} ${PURPLE}←${R} ${D}local${R}\n\n" "$REMOTE_HOST"
+    printf "  ${D}local${R} ${PURPLE}←${R} ${WHITE}${B}%s${R}\n\n" "$REMOTE_HOST"
 
     [[ "$restart" == "true" ]] && zen_close_local
 
@@ -505,7 +505,7 @@ pull_r2() {
     local restart=$1
 
     header "pull"
-    printf "  ${WHITE}${B}R2 cloud${R} ${PURPLE}←${R} ${D}local${R}\n\n"
+    printf "  ${D}local${R} ${PURPLE}←${R} ${WHITE}${B}R2 cloud${R}\n\n"
 
     [[ "$restart" == "true" ]] && zen_close_local
 
@@ -617,9 +617,9 @@ cmd_merge() {
 
     if [[ "$MODE" == "ssh" ]]; then
         local remote="$REMOTE_USER@$REMOTE_HOST"
-        printf "  ${D}local${R} ${PURPLE}⇄${R} ${WHITE}${B}%s${R}\n\n" "$REMOTE_HOST"
+        printf "  ${D}local${R} ${PURPLE}←${R} ${WHITE}${B}%s${R}\n\n" "$REMOTE_HOST"
     else
-        printf "  ${D}local${R} ${PURPLE}⇄${R} ${WHITE}${B}R2 cloud${R}\n\n"
+        printf "  ${D}local${R} ${PURPLE}←${R} ${WHITE}${B}R2 cloud${R}\n\n"
     fi
 
     [[ "$restart" == "true" ]] && zen_close_local
